@@ -1,0 +1,22 @@
+{
+    "name": "bytesgmbh/bytes.php.db",
+    "description": "A (generic) framework for database integrations",
+    "type": "library",
+    "license": "proprietary",
+    "version": "0.1-beta.1",
+    "autoload": {
+        "psr-4": {
+            "BytesPhp\\Db\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "Sebastian Räse",
+            "email": "sebastian.raese@hauptstadtbytes.de"
+        }
+    ],
+    "minimum-stability": "dev",
+    "require": {
+        "catfan/medoo": "dev-master"
+    }
+}
