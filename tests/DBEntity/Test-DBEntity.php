@@ -39,6 +39,15 @@ foreach(DBItem::All($db) as $item) {
     echo("Item ".$item->id." found with title '".$item->Testtitle."'</br>\n");
 }
 
+//get the first item only
+echo("<h3>The first item</h3>");
+
+$item = DBItem::First($db);
+echo("Item ".$item->id." with title '".$item->Testtitle."' without any filter</br>\n");
+
+$item = DBItem::First($db,["Testtitle" => "Hello"]);
+echo("Item ".$item->id." with title '".$item->Testtitle."' for  filter 'testtitle = Hello'</br>\n");
+
 //use null for non-existing properties
 echo("<h3>Use NULL for non-existing Properties</h3>");
 
@@ -46,7 +55,7 @@ foreach(DBItem::All($db) as $item) {
     echo("There should not be any value or error visbile for 'NotExisting' (".$item->id."): ".$item->NotExisting."</br>\n");
 }
 
-//user 'where' parameters for listing item(s)
+//use 'where' parameters for listing item(s)
 echo("<h3>All Items by Filter</h3>");
 
 foreach(DBItem::All($db,["id[<]" => 8]) as $item) {

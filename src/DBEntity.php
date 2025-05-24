@@ -95,6 +95,31 @@ abstract class DBEntity{
 
     }
 
+    //public static method returning the first entity found
+    public static function First(DBConnection $connection, array $where = null): ?DBEntity {
+
+        //get the child class type name
+        $class = get_called_class();
+
+        //parse the 'where' statement
+        if(is_null($where)){
+            $where = [];
+        } else {
+            $where = self::ParseWhere($where);
+        }
+
+        $where["LIMIT"] = 1;
+
+        foreach($connection->select(static::$table,"*",$where) as $row) { //loop for the first row only
+
+            return new $class($connection,$row[static::$idField]);
+
+        }
+
+        return null;
+
+    }
+
     //public static method returning a list of all entities found
     public static function All(DBConnection $connection, array $where = null) : array {
 
