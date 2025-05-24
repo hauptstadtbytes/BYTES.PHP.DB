@@ -47,10 +47,14 @@ foreach(DBItem::All($db) as $item) {
 }
 
 //user 'where' parameters for listing item(s)
-echo("<h3>All Items with ID > 5</h3>");
+echo("<h3>All Items by Filter</h3>");
 
-foreach(DBItem::All($db,["id[>]" => 5]) as $item) {
-    echo("Item ".$item->id." found with title '".$item->Testtitle."'</br>\n");
+foreach(DBItem::All($db,["id[<]" => 8]) as $item) {
+    echo("Item ".$item->id." found with title '".$item->Testtitle."' for filter 'id < 8'</br>\n");
+}
+
+foreach(DBItem::All($db,["testtitle" => "changed again"]) as $item) {
+    echo("Item ".$item->id." found with title '".$item->Testtitle."' for filter 'testtitle = changed again'</br>\n");
 }
 
 //create a new item
