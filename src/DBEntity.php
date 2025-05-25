@@ -19,7 +19,7 @@ abstract class DBEntity{
     public static ?string $idField = null;
 
     //constructor method(s)
-    public function __construct(DBConnection $connection, int $id){
+    public function __construct(DBConnection &$connection, int $id){
 
         $this->connection = $connection;
         $this->id = $id;
@@ -146,7 +146,7 @@ abstract class DBEntity{
     //public method, deleting the current item
     public function Delete() {
 
-        $this->connection->delete(static::$table,[static::$idField => $this->id]);
+        $this->connection->lastResult = $this->connection->delete(static::$table,[static::$idField => $this->id]);
 
     }
 
@@ -287,7 +287,7 @@ abstract class DBEntity{
             }
 
             //update the data set
-            $this->connection->update(static::$table,$updates,$where);
+            $this->connection->lastResult = $this->connection->update(static::$table,$updates,$where);
 
         }
 

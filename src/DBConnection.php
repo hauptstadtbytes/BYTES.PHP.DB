@@ -7,5 +7,9 @@ use Medoo\Medoo as Medoo;
 
 //the database connection class
 class DBConnection extends Medoo{
+
+    //private properties
+    public $lastResult;
+
 }
 ?>

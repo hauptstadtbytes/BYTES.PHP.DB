@@ -101,30 +101,27 @@ echo("</br>\n");
 $jsonProps = '{"id":99,"testtitle":"changed by json","content":"content changed by json again"}';
 $item->AsJSON = $jsonProps;
 echo("The item was changed again (from JSON): ".$item->AsJSON."'</ br>\n");
+echo("</br>\n</br>\n");
+
+echo($db->lastResult->rowCount()." items have been updated in the last DB query</br>\n");
 echo("</br>\n");
 
 $item->test = "sample";//try to update an unknown property
 echo("There shall be no error before this line</ br>\n");
 
 //delete the last item
-//echo("<h3>Remove the last item</h3>");
-$counter = 0;
-$items = DBItem::All($db);
+echo("<h3>Remove all items > 7</h3>");
 
-foreach($items as $item) {
-
-    $counter++;
-
-    if($counter == count($items)) {
+foreach(DBItem::All($db,["id[>]" => 7]) as $item) {
 
         $id = $item->id;
 
-        //$item->Delete();
-        //echo("Item ".$id." removed</ br>\n");
-
-    }
+        $item->Delete();
+        echo("Item ".$id." removed</br>\n");
 
 }
+
+echo($db->lastResult->rowCount()." items have been deleted in the last DB query</br>\n");
 
 //fail to print non-existing items
 //echo("<h3>Non-Existingh Item(s)</h3>");
