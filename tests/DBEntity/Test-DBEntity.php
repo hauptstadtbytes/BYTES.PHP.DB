@@ -95,7 +95,12 @@ echo("</br>\n");
 
 $props = ["Testtitle" => "changed again", "content" => "content changed again"];
 $item->AsArray = $props; //update multiple properties simultaneously
-echo("The item was changed again: ".$item->AsJSON."'</ br>\n");
+echo("The item was changed again (from array): ".$item->AsJSON."'</ br>\n");
+echo("</br>\n");
+
+$jsonProps = '{"id":99,"testtitle":"changed by json","content":"content changed by json again"}';
+$item->AsJSON = $jsonProps;
+echo("The item was changed again (from JSON): ".$item->AsJSON."'</ br>\n");
 echo("</br>\n");
 
 $item->test = "sample";//try to update an unknown property

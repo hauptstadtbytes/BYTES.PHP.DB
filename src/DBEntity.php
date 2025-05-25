@@ -58,6 +58,10 @@ abstract class DBEntity{
             case "asarray":
                 return $this->Write($value);
                 break;
+
+            case "asjson":
+                return $this->Write(json_decode($value,true));
+                break;
                 
             default:
                 return $this->Write([$property => $value]);
