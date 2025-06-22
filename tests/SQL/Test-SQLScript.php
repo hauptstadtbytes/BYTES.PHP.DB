@@ -36,9 +36,9 @@ $db = new DBConnection(["type" => "mysql","host" => $connParams["host"],"databas
 //execute the query
 echo("<h1>Execution Result</h1>");
 
-$file->Execute($db); //execute the script
+$log = $file->Execute($db); //execute the script
 
-foreach($file->log->Cache as $entry) {
+foreach($log->Cache as $entry) {
         echo($entry->timestamp->format('Y-m-d H:i:s').";".$entry->level->name.";".$entry->message."<br />");
 }
 ?>

@@ -15,14 +15,11 @@ class SQLScript{
     //private variable(s)
     private string $path;
     private array $lines = [];
-    private Log $log;
 
     private DBConnection $connection;
 
     //constructor method(s)
     public function __construct(string $path = null) {
-
-        $this->ResetLog();
 
         if(!is_null($path)) {
             $this->Read($path);
@@ -85,10 +82,11 @@ class SQLScript{
     }
 
     //public method executing the command(s)
-    public function Execute(DBConnection $connection) {
+    public function Execute(DBConnection $connection) : Log {
 
-        //reset the log
-        $this->ResetLog();
+        //create a new log instance
+        $myLog = new Log();
+        $myLog->Threshold = InformationLevel::Debug;
         
         //execute the query (writing the result to the log)
         $counter = 0;
@@ -101,7 +99,7 @@ class SQLScript{
 
             if($command === "") { //check for empty commands
 
-                $this->log->Info($counter.": Skipped");
+                $myLog->Info($counter.": Skipped");
 
             } else {
 
@@ -111,21 +109,21 @@ class SQLScript{
 
                     if(count($result) == 0) { //analyze the PDOStatement data returned
 
-                        $this->log->Info($counter.": Executed successful");
+                        $myLog->Info($counter.": Executed successful");
 
                     } else {
 
-                        $this->log->Info($counter.": Failed");
+                        $myLog->Info($counter.": Failed");
 
                     }
 
                 } 
                 catch (\PDOException $e) {
-                    $this->log->Warning($counter.": Failed with message '".$e->getMessage()."'");
+                    $myLog->Warning($counter.": Failed with message '".$e->getMessage()."'");
                 }
                 catch(\Exception $e) {
 
-                    $this->log->Warning($counter.": Failed with message '".$e->getMessage()."'");
+                    $myLog->Warning($counter.": Failed with message '".$e->getMessage()."'");
 
                 }
 
@@ -133,13 +131,8 @@ class SQLScript{
 
         }
 
-    }
-
-    //private function resetting the internal execution log
-    private function ResetLog() {
-
-        $this->log = new Log();
-        $this->log->Threshold = InformationLevel::Debug;
+        //return the log as output
+        return $myLog;
 
     }
 
