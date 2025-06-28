@@ -99,7 +99,7 @@ class SQLScript{
 
             if($command === "") { //check for empty commands
 
-                $myLog->Info($counter.": Skipped");
+                //do nothing
 
             } else {
 
@@ -109,21 +109,21 @@ class SQLScript{
 
                     if(count($result) == 0) { //analyze the PDOStatement data returned
 
-                        $myLog->Info($counter.": Executed successful");
+                        $myLog->Info("Line ".$counter." executed successful");
 
                     } else {
 
-                        $myLog->Info($counter.": Failed");
+                        $myLog->Info("Line ".$counter." failed");
 
                     }
 
                 } 
                 catch (\PDOException $e) {
-                    $myLog->Warning($counter.": Failed with message '".$e->getMessage()."'");
+                    $myLog->Warning("Line ".$counter." failed with message '".$e->getMessage()."'");
                 }
                 catch(\Exception $e) {
 
-                    $myLog->Warning($counter.": Failed with message '".$e->getMessage()."'");
+                    $myLog->Warning("Line ".$counter." failed with message '".$e->getMessage()."'");
 
                 }
 

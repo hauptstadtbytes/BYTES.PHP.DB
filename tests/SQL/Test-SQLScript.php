@@ -15,7 +15,7 @@ use BytesPhp\Db\DBConnection as DBConnection;
 require_once(__DIR__.'/../../vendor/autoload.php');
 
 //load the SQL script file
-$file = new SQLScript(__DIR__."/TestCreate.sql");
+$file = new SQLScript(__DIR__."/Test.sql");
 
 //print the commands
 echo("<h1>Commands in File '".$file->path."'</h1>");
@@ -39,6 +39,6 @@ echo("<h1>Execution Result</h1>");
 $log = $file->Execute($db); //execute the script
 
 foreach($log->Cache as $entry) {
-        echo($entry->timestamp->format('Y-m-d H:i:s').";".$entry->level->name.";".$entry->message."<br />");
+        echo($entry->timestamp->format('Y-m-d H:i:s').";".$entry->level->name.";".$entry->message."<br />\n");
 }
 ?>

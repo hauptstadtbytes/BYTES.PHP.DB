@@ -3,7 +3,7 @@
     "description": "A (generic) framework for database integrations",
     "type": "library",
     "license": "proprietary",
-    "version": "0.1",
+    "version": "0.2",
     "autoload": {
         "psr-4": {
             "BytesPhp\\Db\\": "src/"
@@ -17,6 +17,7 @@
     ],
     "minimum-stability": "dev",
     "require": {
-        "catfan/medoo": "dev-master"
+        "catfan/medoo": "dev-master",
+        "bytesgmbh/bytes.php": "dev-main"
     }
 }

@@ -4,8 +4,49 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "15cb2d13831b721dca935d7d9fb0481c",
+    "content-hash": "7ce6f48e879cfcae82a6a3647de3b12e",
     "packages": [
+        {
+            "name": "bytesgmbh/bytes.php",
+            "version": "dev-main",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/hauptstadtbytes/BYTES.PHP.git",
+                "reference": "78849e89819119bdb3078c45d2e20b3474ae7584"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/hauptstadtbytes/BYTES.PHP/zipball/78849e89819119bdb3078c45d2e20b3474ae7584",
+                "reference": "78849e89819119bdb3078c45d2e20b3474ae7584",
+                "shasum": ""
+            },
+            "default-branch": true,
+            "type": "project",
+            "autoload": {
+                "files": [
+                    "src/Primitives/String.php"
+                ],
+                "psr-4": {
+                    "BytesPhp\\": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "proprietary"
+            ],
+            "authors": [
+                {
+                    "name": "Sebastian Räse",
+                    "email": "sebastian.raese@hauptstadtbytes.de"
+                }
+            ],
+            "description": "A (generic) PHP framework for rapid prototyping and software development",
+            "support": {
+                "issues": "https://github.com/hauptstadtbytes/BYTES.PHP/issues",
+                "source": "https://github.com/hauptstadtbytes/BYTES.PHP/tree/main"
+            },
+            "time": "2025-03-29T06:27:56+00:00"
+        },
         {
             "name": "catfan/medoo",
             "version": "dev-master",
@@ -88,6 +129,7 @@
     "aliases": [],
     "minimum-stability": "dev",
     "stability-flags": {
+        "bytesgmbh/bytes.php": 20,
         "catfan/medoo": 20
     },
     "prefer-stable": false,
