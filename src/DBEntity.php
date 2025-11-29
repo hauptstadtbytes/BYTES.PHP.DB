@@ -165,7 +165,7 @@ abstract class DBEntity{
     //public method compares this data set with another one
     public function Equals($other){
 
-        if($this->id == §other->id){
+        if($this->id == $other->id){
             return true;
         }
 
