@@ -29,6 +29,14 @@ abstract class DBEntity{
     //public (magic) getter method, for reading properties
     public function __get(string $property) {
             
+        //check for a property overwrite
+        $data = $this->ReadProperty($property);
+
+        if(!is_null($data)){
+            return $data;
+        }
+
+        //return the default value
         switch(strtolower($property)) {
 
             case "id":
@@ -53,7 +61,9 @@ abstract class DBEntity{
     //public (magic) setter method, for writing properties
     public  function __set($property, $value) {
 
-        switch(strtolower($property)) {
+        if($this->WriteProperty($property, $value) != true) { //check if the data update was done by the custom handler
+
+            switch(strtolower($property)) {
 
             case "asarray":
                 return $this->Write($value);
@@ -66,6 +76,8 @@ abstract class DBEntity{
             default:
                 return $this->Write([$property => $value]);
             
+            }
+
         }
 
     }
@@ -158,7 +170,14 @@ abstract class DBEntity{
         }
 
         return false;
-        
+
+    }
+
+    //protected method, intended for overwriting proptery reading
+    protected function ReadProperty($property) {
+
+        return null;
+
     }
 
     //protected method, reading the database fields
@@ -259,6 +278,13 @@ abstract class DBEntity{
         }
 
         return null;
+
+    }
+
+    //protected method, intended for overwriting proptery writing
+    protected function WriteProperty($property, $value) {
+
+        return false; //return a boolean, indicating if the property update was finalized
 
     }
 
