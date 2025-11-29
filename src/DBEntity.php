@@ -150,8 +150,19 @@ abstract class DBEntity{
 
     }
 
-    //private method, reading the database fields
-    private function Read(array $fields = null) {
+    //public method compares this data set with another one
+    public function Equals($other){
+
+        if($this->id == §other->id){
+            return true;
+        }
+
+        return false;
+        
+    }
+
+    //protected method, reading the database fields
+    protected function Read(array $fields = null) {
 
         //assemble the selector, mapping known properties to db table fiels ignoring cases/ using '*' as default
         $selector = "*";
@@ -251,8 +262,8 @@ abstract class DBEntity{
 
     }
 
-    //private method, writing to database
-    private function Write(array $properties, array $where = null) {
+    //protected method, writing to database
+    protected function Write(array $properties, array $where = null) {
 
         //remap the properties to db fields and prepare update statement
         $tmpMappings = $this->GetTmpFieldMappings(array_keys($properties));
