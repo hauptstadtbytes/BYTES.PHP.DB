@@ -13,7 +13,7 @@ abstract class DBEntity{
     protected DBConnection $connection;
     protected int $id;
 
-    //public properties
+    //public static properties
     public static ?string $table = null;
     public static array $fieldMappings = [];
     public static ?string $idField = null;
@@ -284,7 +284,7 @@ abstract class DBEntity{
     //protected method, intended for overwriting proptery writing
     protected function WriteProperty($property, $value) {
 
-        return false; //return a boolean, indicating if the property update was finalized
+        return false; //return a boolean, indicating if the property update was finalized (when set to true)
 
     }
 

@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "7ce6f48e879cfcae82a6a3647de3b12e",
+    "content-hash": "cd210829b9bd4bdaf2e2e626b391a393",
     "packages": [
         {
             "name": "bytesgmbh/bytes.php",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/hauptstadtbytes/BYTES.PHP.git",
-                "reference": "78849e89819119bdb3078c45d2e20b3474ae7584"
+                "reference": "fd5e1bfef0cbffdde7d08ad3528f143783ed96a0"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hauptstadtbytes/BYTES.PHP/zipball/78849e89819119bdb3078c45d2e20b3474ae7584",
-                "reference": "78849e89819119bdb3078c45d2e20b3474ae7584",
+                "url": "https://api.github.com/repos/hauptstadtbytes/BYTES.PHP/zipball/fd5e1bfef0cbffdde7d08ad3528f143783ed96a0",
+                "reference": "fd5e1bfef0cbffdde7d08ad3528f143783ed96a0",
                 "shasum": ""
             },
             "default-branch": true,
@@ -45,7 +45,7 @@
                 "issues": "https://github.com/hauptstadtbytes/BYTES.PHP/issues",
                 "source": "https://github.com/hauptstadtbytes/BYTES.PHP/tree/main"
             },
-            "time": "2025-03-29T06:27:56+00:00"
+            "time": "2025-12-20T15:49:10+00:00"
         },
         {
             "name": "catfan/medoo",
