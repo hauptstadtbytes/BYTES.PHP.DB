@@ -35,6 +35,14 @@ foreach(DBReadOnlyItem::All($db) as $item) {
     $lastItem = $item;
 }
 
+echo("<h3>All Filtered Items as Array</h3>");
+foreach(DBReadOnlyItem::All($db,["TestTitle" => "Hello"]) as $item) {
+    //echo("Item ".$item->id." with title '".implode(";",$item->ToArray)."' found</br>\n");
+    echo($item->AsJSON."</br>\n");
+
+    $lastItem = $item;
+}
+
 echo("<h3>Single Property Reading</h3>");
 echo("myID: ".$lastItem->myid."<br />\n");
 echo("TestTitle: ".$lastItem->testtitle."<br />\n");

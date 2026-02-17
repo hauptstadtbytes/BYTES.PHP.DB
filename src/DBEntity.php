@@ -137,17 +137,37 @@ abstract class DBEntity{
     }
 
     //public static method returning a list of all entities found
-    public static function All(DBConnection $connection, array $where = null) : array {
+    public static function All(DBConnection $connection, array $where = null, string $indexProperty = null) : array {
 
         //get the child class type name
         $class = get_called_class();
+
+        //check if the indexproperty is known
+        $indexKnown = false;
+
+        if(array_key_exists($indexProperty,static::$fieldMappings)){
+
+            $indexKnown = true;
+            $indexProperty = static::$fieldMappings[$indexProperty];
+
+        }
 
         //return the output value
         $output = [];
 
         foreach($connection->select(static::$table,"*",self::ParseWhere($where)) as $row) { //loop for all rows found
 
-            $output[] = new $class($connection,$row[static::$idField]);
+            if($indexKnown) {
+
+                $new = new $class($connection,$row[static::$idField]);
+
+                $output[$new->$indexProperty] = $new; 
+
+            } else {
+
+                $output[] = new $class($connection,$row[static::$idField]);
+
+            }
 
         }
 

@@ -35,8 +35,8 @@ foreach(DBItem::All($db) as $item) {
 
 //print all items (with specific properties only)
 echo("<h3>All Items with Specific Properties</h3>");
-foreach(DBItem::All($db) as $item) {
-    echo("Item ".$item->id." found with title '".$item->Testtitle."'</br>\n");
+foreach(DBItem::All($db,null,"id") as $index => $item) {
+    echo("Item ".$item->id." (index '".$index."') found with title '".$item->Testtitle."'</br>\n");
 }
 
 //get the first item only
