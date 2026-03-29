@@ -4,7 +4,7 @@
         "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#installing-dependencies",
         "This file is @generated automatically"
     ],
-    "content-hash": "cd210829b9bd4bdaf2e2e626b391a393",
+    "content-hash": "66dea411574fc13e771c9b2c21eeec0c",
     "packages": [
         {
             "name": "bytesgmbh/bytes.php",
@@ -12,12 +12,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/hauptstadtbytes/BYTES.PHP.git",
-                "reference": "fd5e1bfef0cbffdde7d08ad3528f143783ed96a0"
+                "reference": "73d42f674a10dd6a414923c92418fe5c74f9d06f"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/hauptstadtbytes/BYTES.PHP/zipball/fd5e1bfef0cbffdde7d08ad3528f143783ed96a0",
-                "reference": "fd5e1bfef0cbffdde7d08ad3528f143783ed96a0",
+                "url": "https://api.github.com/repos/hauptstadtbytes/BYTES.PHP/zipball/73d42f674a10dd6a414923c92418fe5c74f9d06f",
+                "reference": "73d42f674a10dd6a414923c92418fe5c74f9d06f",
                 "shasum": ""
             },
             "default-branch": true,
@@ -45,7 +45,7 @@
                 "issues": "https://github.com/hauptstadtbytes/BYTES.PHP/issues",
                 "source": "https://github.com/hauptstadtbytes/BYTES.PHP/tree/main"
             },
-            "time": "2025-12-20T15:49:10+00:00"
+            "time": "2026-03-18T09:09:34+00:00"
         },
         {
             "name": "catfan/medoo",
@@ -53,12 +53,12 @@
             "source": {
                 "type": "git",
                 "url": "https://github.com/catfan/Medoo.git",
-                "reference": "2613656761b98c11ea1fb34502dafde4f4fe6414"
+                "reference": "0a9653a8b99b0853c3dbef3d661d4b359b9686b7"
             },
             "dist": {
                 "type": "zip",
-                "url": "https://api.github.com/repos/catfan/Medoo/zipball/2613656761b98c11ea1fb34502dafde4f4fe6414",
-                "reference": "2613656761b98c11ea1fb34502dafde4f4fe6414",
+                "url": "https://api.github.com/repos/catfan/Medoo/zipball/0a9653a8b99b0853c3dbef3d661d4b359b9686b7",
+                "reference": "0a9653a8b99b0853c3dbef3d661d4b359b9686b7",
                 "shasum": ""
             },
             "require": {
@@ -122,7 +122,7 @@
                     "type": "open_collective"
                 }
             ],
-            "time": "2025-03-31T08:03:33+00:00"
+            "time": "2026-02-03T08:34:27+00:00"
         }
     ],
     "packages-dev": [],

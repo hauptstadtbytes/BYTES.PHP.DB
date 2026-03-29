@@ -2,79 +2,36 @@
 //set the namespace
 namespace BytesPhp\Db;
 
+//add namespace(s) required from 'BYTES.PHP' framework
+use BytesPhp\Data\FieldPropertyMapping as FieldPropertyMapping;
+use BytesPhp\Data\FieldPropertyMappingsList as FieldPropertyMappingsList;
+
 //add internal namespace(s) required
 use BytesPhp\Db\DBConnection as DBConnection;
 use BytesPhp\Db\FieldValueComparison as FieldValueComparison;
 
+use BytesPhp\Db\DBReadOnlyEntity as DBReadOnlyEntity;
+
 //the DB entity base class
-abstract class DBEntity{
-
-    //protected properties
-    protected DBConnection $connection;
-    protected int $id;
-
-    //public static properties
-    public static ?string $table = null;
-    public static array $fieldMappings = [];
-    public static ?string $idField = null;
-
-    //constructor method(s)
-    public function __construct(DBConnection &$connection, int $id){
-
-        $this->connection = $connection;
-        $this->id = $id;
-
-    }
-
-    //public (magic) getter method, for reading properties
-    public function __get(string $property) {
-            
-        //check for a property overwrite
-        $data = $this->ReadProperty($property);
-
-        if(!is_null($data)){
-            return $data;
-        }
-
-        //return the default value
-        switch(strtolower($property)) {
-
-            case "id":
-                return $this->id;
-                break;
-
-            case "asarray":
-                return $this->Read();
-                break;
-
-            case "asjson":
-                return json_encode($this->Read());
-                break;
-                
-            default:
-                return $this->Read([$property]);
-            
-        }
-        
-    }
+abstract class DBEntity extends DBReadOnlyEntity{
 
     //public (magic) setter method, for writing properties
     public  function __set($property, $value) {
 
-        if($this->WriteProperty($property, $value) != true) { //check if the data update was done by the custom handler
+        if($this->WriteProperty($property, $value, static::GetPropertyMappings()) != true) { //check if the data update was done by the custom handler
 
             switch(strtolower($property)) {
 
             case "asarray":
-                return $this->Write($value);
+                return $this->WriteTable($value,static::GetPropertyMappings());
                 break;
 
             case "asjson":
-                return $this->Write(json_decode($value,true));
+                return $this->WriteTable(json_decode($value,true),static::GetPropertyMappings());
                 break;
                 
             default:
-                return $this->Write([$property => $value]);
+                return $this->WriteTable([$property => $value],static::GetPropertyMappings());
             
             }
 
@@ -89,91 +46,15 @@ abstract class DBEntity{
         $class = get_called_class();
 
         //remap the properties to db fields
-        $tmpMappings = self::GetTmpFieldMappings(array_keys($properties));
+        $data = static::RemapArrayToFields($properties,static::GetPropertyMappings());
 
-        $insertValues = [];
-
-        foreach($properties as $key => $val) {
-
-            if(array_key_exists($key,$tmpMappings)) {
-
-                $insertValues[$tmpMappings[$key]] = $val;
-
-            }
-
-        }
-
-        //insert the new item
-        $connection->insert(static::$table,$insertValues);
+        //insert the new itemdata to databse table
+        $connection->insert(static::$table,$data);
 
         //return the output value
-        return new $class($connection,$connection->id());
+        return new $class($connection,$connection->id()); //see 'https://medoo.in/api/insert' for getting the last ID inserted
 
     }
-
-    //public static method returning the first entity found
-    public static function First(DBConnection $connection, array $where = null): ?DBEntity {
-
-        //get the child class type name
-        $class = get_called_class();
-
-        //parse the 'where' statement
-        if(is_null($where)){
-            $where = [];
-        } else {
-            $where = self::ParseWhere($where);
-        }
-
-        $where["LIMIT"] = 1;
-
-        foreach($connection->select(static::$table,"*",$where) as $row) { //loop for the first row only
-
-            return new $class($connection,$row[static::$idField]);
-
-        }
-
-        return null;
-
-    }
-
-    //public static method returning a list of all entities found
-    public static function All(DBConnection $connection, array $where = null, string $indexProperty = null) : array {
-
-        //get the child class type name
-        $class = get_called_class();
-
-        //check if the indexproperty is known
-        $indexKnown = false;
-
-        if(array_key_exists($indexProperty,static::$fieldMappings)){
-
-            $indexKnown = true;
-            $indexProperty = static::$fieldMappings[$indexProperty];
-
-        }
-
-        //return the output value
-        $output = [];
-
-        foreach($connection->select(static::$table,"*",self::ParseWhere($where)) as $row) { //loop for all rows found
-
-            if($indexKnown) {
-
-                $new = new $class($connection,$row[static::$idField]);
-
-                $output[$new->$indexProperty] = $new; 
-
-            } else {
-
-                $output[] = new $class($connection,$row[static::$idField]);
-
-            }
-
-        }
-
-        return $output;
-
-    } 
 
     //public method, deleting the current item
     public function Delete() {
@@ -182,166 +63,24 @@ abstract class DBEntity{
 
     }
 
-    //public method compares this data set with another one
-    public function Equals($other){
+    //property writing method, intended for overwriting property writing child classes
+    protected function WriteProperty(string $property, mixed $value, FieldPropertyMappingsList $mappings) : bool {
 
-        if($this->id == $other->id){
-            return true;
-        }
-
-        return false;
+        return false; //return a boolean, indicating if the update was done (true = no additional action required, false = call the default)
 
     }
 
-    //protected method, intended for overwriting proptery reading
-    protected function ReadProperty($property) {
-
-        return null;
-
-    }
-
-    //protected method, reading the database fields
-    protected function Read(array $fields = null) {
-
-        //assemble the selector, mapping known properties to db table fiels ignoring cases/ using '*' as default
-        $selector = "*";
-
-        $tmpMappings = [];
-
-        if(!is_null($fields)){
-
-            $tmpMappings = $this->GetTmpFieldMappings($fields);
-
-            if(!empty($tmpMappings)) {
-
-                $selector = implode(",",$tmpMappings);
-
-            }
-
-        }
-
-        //query the database
-        foreach($this->connection->select(static::$table,$selector,[static::$idField => $this->id,"LIMIT" => 1]) as $row) { //loop for the first row only
-
-            if(is_array($row)) {
-
-                //create the output value
-                $output = [];
-
-                //add the default mapping if no tmp mapping was defined
-                if(empty($tmpMappings)) {
-
-                    $tmpMappings = static::$fieldMappings;
-
-                }
-
-                //create the output value
-                if(!is_null($fields)){ //a dedicated set of fields has been requested
-
-                    if(count($fields) == 1) {
-
-                        if(array_key_exists($fields[0],$tmpMappings)) {
-
-                            return $row[$tmpMappings[$fields[0]]];
-
-                        } else {
-
-                            return null;
-
-                        }
-
-                    } else {
-
-                        foreach($fields as $field) {
-
-                            if(array_key_exists($field,$tmpMappings)) {
-
-                                $output[$field] = $row[$tmpMappings[$field]];
-
-                            } else {
-
-                                $output[$field] = null;
-
-                            }
-
-                        }
-
-                    }
-
-                } else { //all (default) fields have been requested
-
-                    foreach($tmpMappings as $property => $fieldName) {
-
-                        if(array_key_exists($fieldName,$row)){
-
-                            $output[$property] = $row[$fieldName];
-
-                        } else {
-
-                            $output[$property] = null;
-
-                        }
-                    
-                    }
-
-                }
-
-                //return the output
-                return $output;
-
-            } else { //the query result is e.g. a single string value
-
-                return $row;
-
-            }
-
-        }
-
-        return null;
-
-    }
-
-    //protected method, intended for overwriting proptery writing
-    protected function WriteProperty($property, $value) {
-
-        return false; //return a boolean, indicating if the property update was finalized (when set to true)
-
-    }
-
-    //protected method, writing to database
-    protected function Write(array $properties, array $where = null) {
+    //writing data to database table
+    protected function WriteTable(array $properties, FieldPropertyMappingsList $mappings) {
 
         //remap the properties to db fields and prepare update statement
-        $tmpMappings = $this->GetTmpFieldMappings(array_keys($properties));
+        $updates = static::RemapArrayToFields($properties,$mappings);
 
-        $updates = [];
+        //update the database        
+        if(!empty($updates)){ //check for updates
 
-        foreach($properties as $key => $val) {
-
-            if(array_key_exists($key,$tmpMappings)) {
-
-                if($tmpMappings[$key] != static::$idField) { //prevent ID from being updated
-
-                    $updates[$tmpMappings[$key]] = $val;
-
-                }
-
-            }
-
-        }
-
-        if(!empty($updates)){ //check for any valid updates
-
-            //parse the 'where' statement
-            if(is_null($where)) {
-
-                $where = [static::$idField => $this->id];
-
-            } else {
-
-                $where = $this->ParseWhere($where);
-
-            }
+            //set the 'where' statement
+            $where = [static::$idField => $this->id];
 
             //update the data set
             $this->connection->lastResult = $this->connection->update(static::$table,$updates,$where);
@@ -350,81 +89,26 @@ abstract class DBEntity{
 
     }
 
-    //public static method returning an array of field-mappings, matching the format given
-    public static function GetTmpFieldMappings(array $fields) {
+    //remaps properties for table writing
+    protected static function RemapArrayToFields(array $properties, FieldPropertyMappingsList $mappings) : array{
 
         $output = [];
 
-        $knownFields = array_change_key_case(static::$fieldMappings,CASE_LOWER);
+        foreach($properties as $property => $value) {
 
-        foreach($fields as $field) {
+            if(array_key_exists(strtolower($property),$mappings->AsArrayByPropertyName)){ //the property is known
 
-            if(array_key_exists(strtolower($field),$knownFields)){
+                $mapping = $mappings->AsArrayByPropertyName[strtolower($property)];
 
-                    $output[$field] = $knownFields[strtolower($field)];
+                $output[$mapping->fieldName] = $value;
 
-            } 
+            } else { //apply the update for a raw field index
 
-        }
-
-        return $output;
-
-    }
-
-    //public static method parsing the 'where' statement
-    public static function ParseWhere(?array $where) {
-
-        //check for null
-        if(is_null($where)) {
-            return null;
-        }
-
-        //parse to a list of typed comparing statements
-        $comparingList = [];
-
-        foreach($where as $field => $value) {
-
-            if(is_a($value,'BytesPhp\Db\FieldValueComparison')) {
-
-                $comparingList[$field] = $value;
-
-            } else {
-
-                $matches = [];
-                preg_match('/\[\S]/', $field, $matches);
-
-                if(count($matches) > 0) {
-
-                    $cleanField = preg_replace('/\[\S]/', '', $field);
-                    $operator = str_replace(["[","]"],"",$matches[0]);
-
-                    $comparingList[$cleanField] = new FieldValueComparison($value,$operator); 
-
-                } else {
-
-                    $comparingList[$field] = new FieldValueComparison($value);
-
-                }
-
-            }
-
-        }
-
-        //create the medoo compatible 'where' list, translating properties to DB field name(s)
-        $tmpMappings = self::GetTmpFieldMappings(array_keys($comparingList));
-
-        $output = [];
-
-        foreach($comparingList as $field => $comp) {
-
-            if(array_key_exists($field,$tmpMappings)) {
-
-                $output[$tmpMappings[$field]."[".$comp->operator."]"] = $comp->value;
+                $output[$property] = $value;
 
             }
         }
 
-        //return the output value
         return $output;
 
     }

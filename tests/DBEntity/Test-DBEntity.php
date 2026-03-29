@@ -11,11 +11,34 @@ error_reporting(E_ALL);
 //add framework namespace(s) required
 use BytesPhp\Db\DBConnection as DBConnection;
 
+//add namespace(s) required from 'BYTES.PHP' framework
+use BytesPhp\Data\FieldPropertyMapping as FieldPropertyMapping;
+use BytesPhp\Data\FieldPropertyMappingsList as FieldPropertyMappingsList;
+
+//add internal namsespace(s) required
+use BytesPhp\Db\DBEntity as DBEntity;
+
 require_once(__DIR__.'/../../vendor/autoload.php');
 
-//add internal classes
-require_once(__DIR__.'/DBItem.php');
-require_once(__DIR__.'/NonExistingItem.php');
+class DBItem extends DBEntity{
+    
+    //public properties
+    public static ?string $table = "Items";
+    public static ?string $idField = "id";
+
+    //protected method, intended for overwriting propterty mapping
+    protected static function GetPropertyMappings() : FieldPropertyMappingsList {
+
+        $srcList = [];
+        $srcList[] = new FieldPropertyMapping("id","id");
+        $srcList[] = new FieldPropertyMapping("testtitle","title");
+        $srcList[] = new FieldPropertyMapping("content","content");
+        $srcList[] = new FieldPropertyMapping("body","content");
+
+        return new FieldPropertyMappingsList($srcList);
+
+    }
+}
 
 use BytesPhp\Db\Tests\DBItem as DBItem;
 use BytesPhp\Db\Tests\NonExistingItem as NonExistingItem;
@@ -35,7 +58,20 @@ foreach(DBItem::All($db) as $item) {
 
 //print all items (with specific properties only)
 echo("<h3>All Items with Specific Properties</h3>");
-foreach(DBItem::All($db,null,"id") as $index => $item) {
+foreach(DBItem::All($db,null) as $index => $item) {
+    echo("Item ".$item->id." (index '".$index."') found with title '".$item->Testtitle."'</br>\n");
+}
+
+//use null for non-existing properties
+echo("<h3>Use NULL for non-existing Properties</h3>");
+
+foreach(DBItem::All($db) as $item) {
+    echo("There should not be any value or error visbile for property 'NotExisting' (".$item->id."): ".json_encode($item->NotExisting)."</br>\n");
+}
+
+//print all filtered items
+echo("<h3>All Items matching filter id > 1</h3>");
+foreach(DBItem::All($db,["id[>]" => 1]) as $index => $item) {
     echo("Item ".$item->id." (index '".$index."') found with title '".$item->Testtitle."'</br>\n");
 }
 
@@ -45,26 +81,18 @@ echo("<h3>The first item</h3>");
 $item = DBItem::First($db);
 echo("Item ".$item->id." with title '".$item->Testtitle."' without any filter</br>\n");
 
-$item = DBItem::First($db,["Testtitle" => "Hello"]);
-echo("Item ".$item->id." with title '".$item->Testtitle."' for  filter 'testtitle = Hello'</br>\n");
+$item = DBItem::First($db,["testtitle" => "Hello"]);
+echo("Item ".$item->id." with title '".$item->testtitle."' for  filter 'testtitle = Hello'</br>\n");
 
-//use null for non-existing properties
-echo("<h3>Use NULL for non-existing Properties</h3>");
 
-foreach(DBItem::All($db) as $item) {
-    echo("There should not be any value or error visbile for 'NotExisting' (".$item->id."): ".$item->NotExisting."</br>\n");
-}
+//get the first item with property overloading
+echo("<h3>The first item with property overloading</h3>");
 
-//use 'where' parameters for listing item(s)
-echo("<h3>All Items by Filter</h3>");
+$item = DBItem::First($db,["body" => "World!"]);
+echo("Item ".$item->id." with title '".$item->testtitle."' for  filter 'body/content = World!'</br>\n");
 
-foreach(DBItem::All($db,["id[<]" => 8]) as $item) {
-    echo("Item ".$item->id." found with title '".$item->Testtitle."' for filter 'id < 8'</br>\n");
-}
-
-foreach(DBItem::All($db,["testtitle" => "changed again"]) as $item) {
-    echo("Item ".$item->id." found with title '".$item->Testtitle."' for filter 'testtitle = changed again'</br>\n");
-}
+$item = DBItem::First($db,["content" => "World!"]);
+echo("Item ".$item->id." with title '".$item->testtitle."' for  filter 'body/content = World!'</br>\n");
 
 //create a new item
 echo("<h3>Create new items</h3>");
@@ -86,7 +114,7 @@ echo("Item ".$item->id." created with all information:</ br>\n");
 echo($item->AsJSON."</ br>\n</br>\n");
 
 //update the new item
-echo("<h3>Update the (Last) Item</h3>");
+echo("<h3>Update the Last Item</h3>");
 $title = $item->Testtitle;
 
 $item->Testtitle = "another title";
@@ -98,7 +126,7 @@ $item->AsArray = $props; //update multiple properties simultaneously
 echo("The item was changed again (from array): ".$item->AsJSON."'</ br>\n");
 echo("</br>\n");
 
-$jsonProps = '{"id":99,"testtitle":"changed by json","content":"content changed by json again"}';
+$jsonProps = '{"id":'.$item->id.',"testtitle":"changed by json","content":"content changed by json again"}';
 $item->AsJSON = $jsonProps;
 echo("The item was changed again (from JSON): ".$item->AsJSON."'</ br>\n");
 echo("</br>\n</br>\n");
@@ -106,10 +134,10 @@ echo("</br>\n</br>\n");
 echo($db->lastResult->rowCount()." items have been updated in the last DB query</br>\n");
 echo("</br>\n");
 
-$item->test = "sample";//try to update an unknown property
-echo("There shall be no error before this line</ br>\n");
+//$item->test = "sample";//trying to update a non-existing column will result in a PDO exception
+//echo("There shall be no error before this line</ br>\n");
 
-//delete the last item
+//delete the last items
 echo("<h3>Remove all items > 7</h3>");
 
 foreach(DBItem::All($db,["id[>]" => 7]) as $item) {
@@ -120,12 +148,4 @@ foreach(DBItem::All($db,["id[>]" => 7]) as $item) {
         echo("Item ".$id." removed</br>\n");
 
 }
-
-echo($db->lastResult->rowCount()." items have been deleted in the last DB query</br>\n");
-
-//fail to print non-existing items
-//echo("<h3>Non-Existingh Item(s)</h3>");
-//foreach(NonExistingItem::All($db) as $item) {
-    //echo("Item ".$item->id." found with title '".$item->title."'</br>\n");
-//}
 ?>
